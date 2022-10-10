@@ -1,0 +1,18 @@
+{%extends "home.html"%}
+
+    {%block content%}
+    <h5>{{ text }}</h5>
+    <p>{{ messge }}</p>
+    <form  class="form"action="{{ url_for('addsignin') }}" method="post">
+        <h2>Sign in</h2>
+        <div class="inputbox">
+            <label for="email">Email</label><br>
+            <input type="email" id="email" name="email"required><br>
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+            Not a member?
+            <a href="/signup">Signup</a><br><br>
+            <button type="submit" class="btn">Sign in</button>
+        </div><br>
+    </form>
+    {%endblock%}
