@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, session 
+
+from turtle import st
+from flask import Flask, render_template, request, redirect, url_for, session
+from markupsafe import escape
 import ibm_db
-import re
 
 app = Flask(__name__)
 
@@ -11,7 +13,7 @@ conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=98538591-7217-4024-b027-8baa776ff
 #conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=19af6446-6171-4641-8aba-9dcff8e1b6ff.c1ogj3sd0tgtu0lqde00.databases.appdomain.cloud;PORT=30699;SECURITY=SSL;SSLServerCertificate=DigiCertGlobalRootCA.crt;UID=mbs46040;PWD=MIEpZ1DoqwMRpGvs",'','')
 
 #HOME--PAGE
-@app.route("/home")
+@app.route("/homepage")
 def home():
     return render_template("homepage.html")
 
@@ -35,23 +37,29 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        
 
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM register WHERE username = % s', (username, ))
-        account = cursor.fetchone()
-        print(account)
-        if account:
-            msg = 'Account already exists !'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+        sql = "SELECT * FROM register WHERE username =?"
+        stmt = ibm_db.prepare(conn, sql)
+        ibm_db.bind_param(stmt,1,username)
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+
+    if account:
+      return render_template('login.html', msg="You are already a member, please login using your details")
+    elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             msg = 'Invalid email address !'
-        elif not re.match(r'[A-Za-z0-9]+', username):
+    elif not re.match(r'[A-Za-z0-9]+', username):
             msg = 'name must contain only characters and numbers !'
-        else:
-            cursor.execute('INSERT INTO register VALUES ( % s, % s, % s)', (username, email,password))
-            mysql.connection.commit()
-            msg = 'You have successfully registered !'
-            return render_template('signup.html', msg = msg)
+    else:
+      insert_sql = "INSERT INTO register VALUES (?,?,?)"
+      prep_stmt = ibm_db.prepare(conn, insert_sql)
+      ibm_db.bind_param(prep_stmt, 1, username)
+      ibm_db.bind_param(prep_stmt, 2, email)
+      ibm_db.bind_param(prep_stmt, 3, password)
+      ibm_db.execute(prep_stmt)
+      return render_template('signup.html', msg="Student Data saved successfuly..")
+
+
        
         
  #LOGIN--PAGE
@@ -69,29 +77,24 @@ def login():
     if request.method == 'POST' :
         username = request.form['username']
         password = request.form['password']
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT * FROM register WHERE username = % s AND password = % s', (username, password ),)
-        account = cursor.fetchone()
-        print (account)
         
-        if account:
+        sql = "SELECT * FROM register WHERE username =? and password=?"
+        stmt = ibm_db.prepare(conn, sql)
+        ibm_db.bind_param(stmt,1,username)
+        ibm_db.bind_param(stmt,2,password)
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+
+    if account:
             session['loggedin'] = True
             session['id'] = account[0]
             userid=  account[0]
             session['username'] = account[1]
             return redirect('/home')
-        
-        else:
+    else:
             msg = 'Incorrect username / password !'
 
     return render_template('login.html', msg = msg)
-
-
-
-       
-
-
-
 
 
 #ADDING----DATA
@@ -104,19 +107,30 @@ def adding():
 
 @app.route('/addexpense',methods=['GET', 'POST'])
 def addexpense():
-     
-    date = request.form['date']
-    expensename = request.form['expensename']
-    amount = request.form['amount']
-    paymode = request.form['paymode']
-    category = request.form['category']
+    if request.method == 'POST' :     
+        date = request.form['date']
+        expensename = request.form['expensename']
+        amount = request.form['amount']
+        paymode = request.form['paymode']
+        category = request.form['category']
+
+        
+        sql = "INSERT INTO expenses VALUES (?,?,?,?,?,,?)"
+        stmt = ibm_db.prepare(conn, sql)
+        ibm_db.bind_param(stmt,1,session[id])
+        ibm_db.bind_param(stmt,2,date)
+        ibm_db.bind_param(stmt,3,expensename)
+        ibm_db.bind_param(stmt,4,amount)
+        ibm_db.bind_param(stmt,5,paymode)
+        ibm_db.bind_param(stmt,6,category)
+        ibm_db.execute(stmt)
+        account = ibm_db.fetch_assoc(stmt)
+
+
     
-    cursor = mysql.connection.cursor()
-    cursor.execute('INSERT INTO expenses VALUES ( % s, % s, % s, % s, % s, % s)', (session['id'] ,date, expensename, amount, paymode, category))
-    mysql.connection.commit()
-    print(date + " " + expensename + " " + amount + " " + paymode + " " + category)
-    
-    return redirect("/display")
+        print(date + " " + expensename + " " + amount + " " + paymode + " " + category)
+        
+        return redirect("/display")
 
 
 
@@ -127,11 +141,10 @@ def addexpense():
 @app.route("/display")
 def display():
     print(session["username"],session['id'])
-    
-    cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM expenses ORDER BY date DESC'.format(str(session['id'])))
-    expense = cursor.fetchall()
-  
+
+    insert_sql = "SELECT * FROM expenses ORDER BY date DESC"
+    prep_stmt = ibm_db.prepare(conn, insert_sql)
+    ibm_db.execute(prep_stmt)
        
     return render_template('display.html' ,expense = expense)
                           
@@ -143,9 +156,12 @@ def display():
 
 @app.route('/delete/<string:id>', methods = ['POST', 'GET' ])
 def delete(id):
-     cursor = mysql.connection.cursor()
-     cursor.execute('DELETE FROM expenses WHERE  userid = %s', (id,))
-     mysql.connection.commit()
+
+     insert_sql = "DELETE FROM expenses WHERE  userid = ?"
+     prep_stmt = ibm_db.prepare(conn, insert_sql)
+     ibm_db.bind_param(stmt,1,id)
+     ibm_db.execute(prep_stmt)
+       
      print('deleted successfully')    
      return redirect("/display")
  
@@ -154,9 +170,10 @@ def delete(id):
 
 @app.route('/edit/<id>', methods = ['POST', 'GET' ])
 def edit(id):
-    cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM expenses WHERE  userid = %s', (id,))
-    row = cursor.fetchall()
+    insert_sql = "SELECT * FROM expenses WHERE  userid = ?"
+    prep_stmt = ibm_db.prepare(conn, insert_sql)
+    ibm_db.bind_param(stmt,1,id)
+    ibm_db.execute(prep_stmt)
    
     print(row[0])
     return render_template('edit.html', expenses = row[0])
@@ -174,10 +191,16 @@ def update(id):
       paymode = request.form['paymode']
       category = request.form['category']
     
-      cursor = mysql.connection.cursor()
-       
-      cursor.execute("UPDATE `expenses` SET `date` = % s , `expensename` = % s , `amount` = % s, `paymode` = % s, `category` = % s WHERE `expenses`.`userid` = % s ",(date, expensename, amount, str(paymode), str(category),id))
-      mysql.connection.commit()
+      insert_sql = "UPDATE `expenses` SET `date` = ? , `expensename` = ? , `amount` = ? , `paymode` = ? , `category` = ? WHERE `expenses`.`userid` = ? "
+      prep_stmt = ibm_db.prepare(conn, insert_sql)
+      ibm_db.bind_param(stmt,1,date)
+      ibm_db.bind_param(stmt,2,expensename)
+      ibm_db.bind_param(stmt,3,amount)
+      ibm_db.bind_param(stmt,4,str(paymode))
+      ibm_db.bind_param(stmt,5,str(category))
+      ibm_db.bind_param(stmt,6,id)
+      ibm_db.execute(prep_stmt)
+
       print('successfully updated')
       return redirect("/display")
      
@@ -197,21 +220,30 @@ def limit():
 def limitnum():
      if request.method == "POST":
          number= request.form['number']
-         cursor = mysql.connection.cursor()
-         cursor.execute('INSERT INTO limits VALUES (% s, % s) ',(session['id'], number))
-         mysql.connection.commit()
+
+         insert_sql = "INSERT INTO limits VALUES (?,?)"
+         prep_stmt = ibm_db.prepare(conn, insert_sql)
+         ibm_db.bind_param(stmt,1,session[id])
+         ibm_db.bind_param(stmt,2,number)
+         ibm_db.execute(prep_stmt)
+
          return redirect('/limitn')
      
          
 @app.route("/limitn") 
 def limitn():
-    cursor = mysql.connection.cursor()
-    cursor.execute('SELECT limits FROM limits ORDER BY `limits`.`id` DESC LIMIT 1')
-    x= cursor.fetchone()
-    s = x#[0]
+
+         insert_sql = "SELECT limits FROM limits ORDER BY `limits`.`id` DESC LIMIT 1"
+         prep_stmt = ibm_db.prepare(conn, insert_sql)
+         ibm_db.bind_param(stmt,1,session[id])
+         ibm_db.bind_param(stmt,2,number)
+         ibm_db.execute(prep_stmt)
+         account = ibm_db.fetch_assoc(prep_stmt)
+ 
+         s = amount
     
     
-    return render_template("limit.html" , y= s)
+         return render_template("limit.html" , y= s)
 
 #REPORT
 

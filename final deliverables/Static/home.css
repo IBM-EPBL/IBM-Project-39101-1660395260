@@ -43,7 +43,7 @@ p {
 }
 .section-title span {
 	/*color: crimson;*/
-	color: yellowgreen;
+	color: pink;
 }
 
 .cta {
@@ -51,7 +51,7 @@ p {
 	padding: 10px 30px;
 	color: white;
 	background-color: transparent;
-	border: 2px solid yellowgreen;
+	border: 2px solid pink;
 	font-size: 2rem;
 	text-transform: uppercase;
 	letter-spacing: 0.1rem;
@@ -61,7 +61,7 @@ p {
 }
 .cta:hover {
 	color: white;
-	background-color: yellowgreen;
+	background-color: pink;
 }
 .brand h1 {
 	font-size: 3rem;
@@ -141,7 +141,7 @@ p {
 	letter-spacing: initial;
 }
 #header .nav-list ul li:hover a {
-	color: yellowgreen;
+	color: pink;
 }
 #header .hamburger {
 	height: 60px;
@@ -201,7 +201,6 @@ p {
 
 /* Hero Section */
 #hero {
-	background-image: url(../images/bg.jpg);
 	background-size: cover;
 	background-position: top center;
 	position: relative;
@@ -214,8 +213,6 @@ p {
 	top: 0;
 	height: 100%;
 	width: 100%;
-	background-color: black;
-	opacity: 0.7;
 	z-index: -1;
 }
 #hero .hero {
@@ -249,7 +246,7 @@ p {
 	left: 0;
 	height: 100%;
 	width: 0;
-	background-color: yellowgreen;
+	background-color: pink;
 	animation: text_reveal_box 1s ease;
 	animation-delay: 0.5s;
 }
@@ -546,7 +543,7 @@ p {
 }
 @keyframes text_reveal_name {
 	100% {
-		color: yellowgreen;
+		color: pink;
 		font-weight: 500;
 	}
 }

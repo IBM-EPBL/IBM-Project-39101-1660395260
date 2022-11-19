@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,8 +20,7 @@
 		
 		
 		<div class="login-content">
-			
-			<form action='homepage.html' method="POST">
+			<form method="post" action="{{ url_for('homepage') }}">
 				<div class="msg"></div>
 				<h2 class="title">Welcome</h2>
            		<div class="input-div one">
@@ -45,19 +43,7 @@
             	</div>
             	<a href="#">Forgot Password?</a>
             	<input type="submit" class="btn" value="Login">
-				<span>OR</span>
-				
-				<div><b>Login with</b></div>
-				<div>
-					<ul>
-						<li><a href="#"><i class="fab fa-facebook" aria-hidden="true"></i></a></li>
-						<li><a href="#"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
-						<li><a href="#"><i class="fab fa-google"  aria-hidden="true"></i></a></li>
-						<li><a href="#"><i class="fab fa-linkedin" aria-hidden="true"></i></a></li>
-						<li><a href="#"><i class="fab fa-instagram" aria-hidden="true"></i></a></li>
-					</ul>
-					
-				</div> 
+			<br>
 				<div class="app" ><b>Don't have an account?</b><a id="app1" href="{{url_for('signup')}}">REGISTER</a></div>
             </form>
 			

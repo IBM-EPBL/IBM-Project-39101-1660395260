@@ -9,6 +9,18 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
   <script src="{{url_for('static', filename='home.js')}}"></script>
   <title>Personal Expense Tracker</title>
+  <style>
+    
+    .hero-image {
+      background-image: url("https://i.pinimg.com/originals/c1/5c/ba/c15cbae66a8a930a1cb292aaf60bb815.jpg");
+      height: 50%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+    }
+    </style>
+
 </head>
 
 <body>
@@ -41,15 +53,17 @@
 
 
   <!-- Hero Section  -->
+  <div class="hero-image">
   <section id="hero">
     <div class="hero container">
-      <div>
-        
+      
+        <div>
         <h1>Personal Expense Tracker <span></span></h1>
         <a href="{{url_for('signup')}}" type="button" class="cta">Sign-up</a> 
-      </div>
-    </div>
+      </div></div>
+    </section>
   </section>
+</div>
   <!-- End Hero Section  -->
 
   <!-- Service Section -->
