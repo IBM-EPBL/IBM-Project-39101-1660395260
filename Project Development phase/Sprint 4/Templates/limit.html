@@ -1,20 +1,222 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+   
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <title>Limit-Daily Expense</title>
+  <style>
+.header{
+display: flex;
+padding:10px;
+background-color: #eaf0f6;
+width:100%;
+justify-content: space-around;
+align-items: center;
+}
 
-{% block body %} 
+.nav li{
 
-<p> Currently your MONTHLY limit is ₹ {{y}} </p>
+margin:10px;
+
+}
+.nav li a{
+color: black;
+padding: 10px;
+}
+.nav li a:hover{
+background-color:black;
+color: whitesmoke;
+border-radius: 5px;
+text-decoration: none;;
+}
+body{
+          background-color: #eaf0f6;
+      }
+
+  </style>
+</head>
+<body>
+<!-- header -->
+<div class="header">
+
+  <h1 style="color:black;position: relative;right: auto;font-size: 25px;">Daily Expenses </h1>
+          <!-- top-nav -->
+          <ul class="nav">
+            <li><a href="/UserHome">Home</a></li>
+                      <li><a href="/SetLimit">SetLimit</a></li>
+            <li><a href="/Search" >Expenses</a></li>
+                        <li><a href="/UReport">Report</a></li>
+             <li><a href="/MonthReport">MonthReport</a></li>
+            <li><a href="/">Logout</a></li>
+          </ul> 
+</div>
+
+<br>
+<br>
+<blockquote class="blockquote text-center">
+</blockquote>
+<br>
+
+<br>
+<!-- header -->
+<!-- banner -->
 
 
-<form action="/limitnum" method="POST">
+</div>
+<!-- //banner -->
 
-    <p> ENTER the MONTHLY LIMIT to avoid over EXPENSES</p> <br/>
-    <input type="number" name="number" required/> <span> 
-        <button class="btn btn-warning" type="submit">ENTER</button>
-    </span>
-    
+<div class="card">
+  <div class="card-body">
+<div class="about all_pad">
+	<div class="container">
+		<h3 class="title">Set Expense Limit</h3>
 
+		<form action="/setlimit" method="post" enctype="multipart/form-data" name="form1" id="form1">
+
+			<div>
+			  <table width="100%" border="0">
+                <tr>
+                  <td width="25%">&nbsp;</td>
+                  <td width="21%">&nbsp;</td>
+                  <td width="29%">&nbsp;</td>
+                  <td width="25%">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>Month</td>
+                  <td><select name="mon" id="mon">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                       <option value="3">3</option>
+                       <option value="4">4</option>
+                       <option value="5">5</option>
+                       <option value="6">6</option>
+                       <option value="7">7</option>
+                       <option value="8">8</option>
+                       <option value="9">9</option>
+                       <option value="10">10</option>
+                       <option value="11">11</option>
+                       <option value="12">12</option>
+
+                  </select>                  </td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>Year</td>
+                  <td><select name="yea" id="yea">
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                       <option value="2024">2024</option>
+                       <option value="2025">2025</option>
+                  </select> </td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>Amount</td>
+                  <td><input name="t2" type="text" id="t2"></td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+
+
+                  <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+
+
+
+
+
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td><input name="submit" type="submit" value="Submit" />
+                  <input type="reset" name="Reset" value="Reset"></td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+              </table>
+
+            </div>
+
+            <div>
+
+                <table width="100%" border="0" align="center">
+              <tr>
+
+
+
+                <td ><div align="center" class="style5"><strong>Username</strong></div></td>
+                <td ><div align="center" class="style5"><strong>Month</strong></div></td>
+                <td ><div align="center" class="style5"><strong>Year</strong></div></td>
+                <td ><div align="center" class="style5"><strong>Amount</strong></div></td>
+                <td ><div align="center" class="style5"><strong>Remove</strong></div></td>
+
+
+
+              </tr>
+			  {% for item in data %}
+              <tr>
+
+                <td><div align="center">{{item[1]}}</div></td>
+
+                <td><div align="center">{{item[2]}}</div></td>
+                <td><div align="center">{{item[3]}}</div></td>
+                <td><div align="center">{{item[4]}}</div></td>
+                  <td><div align="center"><a href="remove?uname={{item[1]}}&mon={{item[2]}}&year={{item[3]}}">Remove</a></div></td>
+
+
+              </tr>
+			  {% endfor %}
+
+            </table>
+
+             </div>
 
 
 </form>
-{% endblock %}
 
+	</div>
+</div>
+</div>
+</div>
+
+
+	
+</body>
+</html>
